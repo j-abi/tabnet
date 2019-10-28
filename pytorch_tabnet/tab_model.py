@@ -16,10 +16,10 @@ class TorchDataset(Dataset):
 
     Parameters
     ----------
-        X: 2D array
-            The input matrix
-        y: 2D array
-            The one-hot encoded target
+    X: 2D array
+        The input matrix
+    y: 2D array
+        The one-hot encoded target
     """
 
     def __init__(self, x, y):
@@ -42,15 +42,15 @@ class Model(object):
 
         Parameters
         ----------
-            type: str
-                Model type ('classification' or 'regression').
-            device_name: str
-                'cuda' if running on GPU, 'cpu' if not, 'auto' to autodetect
-            save: bool
-                If True, save model in path. Model name will be the time stamp
-                of its execution.
-            load: str
-                Name of model that should be loaded.
+        type: str
+            Model type ('classification' or 'regression').
+        device_name: str
+            'cuda' if running on GPU, 'cpu' if not, 'auto' to autodetect
+        save: bool
+            If True, save model in path. Model name will be the time stamp
+            of its execution.
+        load: str
+            Name of model that should be loaded.
         """
 
         # Defining device
@@ -65,14 +65,15 @@ class Model(object):
     def def_network(self, network, **kwargs):
         """Defines network architecture and attributes **kwargs to network
         parameters, e.g. `input_dim`, `output_dim` and `layers`.
+
         If load is passed to model init, it ignores all parameters and load
         the file located at path/load.pt,
 
         Parameters
         ----------
-            network: a :class: `nn.Module`
-                The network whose weights will be updated in training.
-                See `network.py` for possible networks.
+        network: nn.Module
+            The network whose weights will be updated in training.
+            See `network.py` for possible networks.
         """
         self.network = network(**kwargs).to(self.device)
 
@@ -82,32 +83,32 @@ class Model(object):
 
         Parameters
         ----------
-            loss_fn: :class: `torch.nn.functional`
-                The loss function. A few options:
-                    - torch.nn.functional.mse_loss
-                    - torch.nn.functional.binary_cross_entropy
-                    - torch.nn.functional.cross_entropy
-                    - torch.nn.functional.l1_loss
-            max_epochs: int
-                The maximum number of epochs for training
-            patience: int
-            learning_rate: float
-                The initial learning rate
-            schedule: str
-                The learning rate schedule('lambda', 'cos',
-                'exp' or 'step' or None).
-            lr_params: dict
-                Additional infos on the learning rate scheduler
-                See https://pytorch.org/docs/master/optim.html for params
-                of each scheduler type.
-            optimizer_fn: :class: torch.optim object
-                The optimizer function to be used. A few options:
-                    - torch.optim.SGD
-                    - torch.optim.Adam
-                    - torch.optim.Adadelta
-            opt_params: dict
-                Further parameters to be used by optimizer_fn.
-                or None)
+        loss_fn: torch.nn.functional
+            The loss function. A few options:
+                - torch.nn.functional.mse_loss
+                - torch.nn.functional.binary_cross_entropy
+                - torch.nn.functional.cross_entropy
+                - torch.nn.functional.l1_loss
+        max_epochs: int
+            The maximum number of epochs for training
+        patience: int
+        learning_rate: float
+            The initial learning rate
+        schedule: str
+            The learning rate schedule('lambda', 'cos',
+            'exp' or 'step' or None).
+        lr_params: dict
+            Additional infos on the learning rate scheduler
+            See https://pytorch.org/docs/master/optim.html for params
+            of each scheduler type.
+        optimizer_fn: :class: torch.optim object
+            The optimizer function to be used. A few options:
+                - torch.optim.SGD
+                - torch.optim.Adam
+                - torch.optim.Adadelta
+        opt_params: dict
+            Further parameters to be used by optimizer_fn.
+            or None)
 
         """
         # default params
@@ -152,24 +153,25 @@ class Model(object):
     def fit(self, X_train, y_train, X_valid=None, y_valid=None,
             balanced=False, weights=None):
         """Train a neural network stored in self.network
+
         Using train_dataloader for training data and
         valid_dataloader for validation.
 
         Parameters
         ----------
-            X_train: np.ndarray
-                Train set
-            y_train : np.array
-                Train targets
-            X_train: np.ndarray
-                Train set
-            y_train : np.array
-                Train targets
-            balanced : bool
-                If set to True, training will oversample less frequent classes
-            weights : dictionnary
-                For classification problems only, a dictionnary with keys ranging from
-                0 to output_dim - 1, with corresponding weights for each class
+        X_train: np.ndarray
+            Train set
+        y_train : np.array
+            Train targets
+        X_train: np.ndarray
+            Train set
+        y_train : np.array
+            Train targets
+        balanced : bool
+            If set to True, training will oversample less frequent classes
+        weights : dictionnary
+            For classification problems only, a dictionnary with keys ranging from
+            0 to output_dim - 1, with corresponding weights for each class
 
         """
         # Initialize counters and histories.
@@ -251,10 +253,10 @@ class Model(object):
 
         Parameters
         ----------
-            train_dataloader: a :class: `torch.utils.data.Dataloader`
-                DataLoader with train set
-            valid_dataloader: a :class: `torch.utils.data.Dataloader`
-                DataLoader with valid set
+        train_dataloader: a :class: `torch.utils.data.Dataloader`
+            DataLoader with train set
+        valid_dataloader: a :class: `torch.utils.data.Dataloader`
+            DataLoader with valid set
         """
         train_metrics = self.train_epoch(train_dataloader)
         valid_metrics = self.predict_epoch(valid_dataloader)
@@ -270,8 +272,8 @@ class Model(object):
 
         Parameters
         ----------
-            train_loader: a :class: `torch.utils.data.Dataloader`
-                DataLoader with train set
+        train_loader: a :class: `torch.utils.data.Dataloader`
+            DataLoader with train set
         """
 
         self.network.train()
@@ -321,10 +323,10 @@ class Model(object):
 
         Parameters
         ----------
-            data: a :tensor: `torch.tensor`
-                Input data
-            target: a :tensor: `torch.tensor`
-                Target data
+        data: torch.Tensor
+            Input data
+        target: torch.Tensor
+            Target data
         """
         self.network.train()
         data = data.to(self.device).float()
@@ -353,8 +355,8 @@ class Model(object):
 
         Parameters
         ----------
-            loader: a :class: `torch.utils.data.Dataloader`
-                    DataLoader with validation set
+        loader: torch.utils.data.Dataloader
+            DataLoader with validation set
         """
         y_preds = []
         ys = []
@@ -398,14 +400,14 @@ class Model(object):
 
         Parameters
         ----------
-            data: a :tensor: `torch.Tensor`
-                Input data
-            target: a :tensor: `torch.Tensor`
-                Target data
+        data: torch.Tensor
+            Input data
+        target: torch.Tensor
+            Target data
 
         Returns
         -------
-            batch_outs: dict
+        batch_outs: dict
         """
         self.network.eval()
         data = data.to(self.device).float()
@@ -431,14 +433,14 @@ class Model(object):
 
         Parameters
         ----------
-            data: a :tensor: `torch.Tensor`
-                Input data
-            target: a :tensor: `torch.Tensor`
-                Target data
+        data: torch.Tensor
+            Input data
+        target: torch.Tensor
+            Target data
 
         Returns
         -------
-            batch_outs: dict
+        batch_outs: dict
         """
         self.network.eval()
         data = torch.Tensor(X).to(self.device).float()

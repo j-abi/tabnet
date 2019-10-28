@@ -2,12 +2,12 @@ from torch import nn
 from torch.autograd import Function
 import torch
 
-
-# Other possible implementations:
-#  https://github.com/KrisKorrel/sparsemax-pytorch/blob/master/sparsemax.py
-#  https://github.com/msobroza/SparsemaxPytorch/blob/master/mnist/sparsemax.py
-# https://github.com/vene/sparse-structured-attention/blob/master/pytorch/torchsparseattn/sparsemax.py
-
+"""
+Other possible implementations:
+* https://github.com/KrisKorrel/sparsemax-pytorch/blob/master/sparsemax.py
+* https://github.com/msobroza/SparsemaxPytorch/blob/master/mnist/sparsemax.py
+* https://github.com/vene/sparse-structured-attention/blob/master/pytorch/torchsparseattn/sparsemax.py
+"""
 
 
 # credits to Yandex https://github.com/Qwicen/node/blob/master/lib/nn_utils.py
@@ -21,7 +21,8 @@ def _make_ix_like(input, dim=0):
 
 class SparsemaxFunction(Function):
     """
-    An implementation of sparsemax (Martins & Astudillo, 2016). See
+    An implementation of sparsemax (Martins & Astudillo, 2016).
+
     :cite:`DBLP:journals/corr/MartinsA16` for detailed description.
     By Ben Peters and Vlad Niculae
     """
@@ -29,11 +30,18 @@ class SparsemaxFunction(Function):
     @staticmethod
     def forward(ctx, input, dim=-1):
         """sparsemax: normalizing sparse transform (a la softmax)
-        Parameters:
-            input (Tensor): any shape
-            dim: dimension along which to apply sparsemax
-        Returns:
-            output (Tensor): same shape as input
+
+        Parameters
+        ----------
+        input: torch.Tensor
+            input tensor (any shape)
+        dim: int
+            dimension along which to apply sparsemax
+
+        Returns
+        -------
+        torch.Tensor
+            output tensor (same shape as input)
         """
         ctx.dim = dim
         max_val, _ = input.max(dim=dim, keepdim=True)
@@ -55,15 +63,22 @@ class SparsemaxFunction(Function):
         grad_input = torch.where(output != 0, grad_input - v_hat, grad_input)
         return grad_input, None
 
-
     @staticmethod
     def _threshold_and_support(input, dim=-1):
         """Sparsemax building block: compute the threshold
-        Args:
-            input: any dimension
-            dim: dimension along which to apply the sparsemax
-        Returns:
+
+        Parameters
+        ----------
+        input: torch.Tensor
+            input tensor (any dimension)
+        dim: int
+            dimension along which to apply the sparsemax
+
+        Returns
+        -------
+        tau: float
             the threshold value
+        support_size: int
         """
 
         input_srt, _ = torch.sort(input, descending=True, dim=dim)
@@ -75,9 +90,6 @@ class SparsemaxFunction(Function):
         tau = input_cumsum.gather(dim, support_size - 1)
         tau /= support_size.to(input.dtype)
         return tau, support_size
-
-
-#sparsemax = lambda input, dim=-1: SparsemaxFunction.apply(input, dim)
 
 
 sparsemax = SparsemaxFunction.apply
@@ -95,7 +107,9 @@ class Sparsemax(nn.Module):
 
 class Entmax15Function(Function):
     """
-    An implementation of exact Entmax with alpha=1.5 (B. Peters, V. Niculae, A. Martins). See
+    An implementation of exact Entmax with alpha=1.5 (B. Peters, V. Niculae, A. Martins)
+
+    See
     :cite:`https://arxiv.org/abs/1905.05702 for detailed description.
     Source: https://github.com/deep-spin/entmax
     """
@@ -174,9 +188,9 @@ class Entmoid15(Function):
         return grad_input
 
 
-
 entmax15 = Entmax15Function.apply
 entmoid15 = Entmoid15.apply
+
 
 class Entmax15(nn.Module):
 
@@ -186,8 +200,6 @@ class Entmax15(nn.Module):
 
     def forward(self, input):
         return entmax15(input, self.dim)
-
-
 
 
 # Credits were lost...
